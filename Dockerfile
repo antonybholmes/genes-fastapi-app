@@ -18,7 +18,7 @@ RUN runDeps="$(scanelf --needed --nobanner --recursive /env \
     && apk add --virtual rundeps $runDeps
 RUN apk del build-deps
 
-COPY . .
+ADD . .
 
 # Needed to get uvicorn working
 ENV VIRTUAL_ENV /env
