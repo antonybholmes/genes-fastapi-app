@@ -1,0 +1,10 @@
+*.pyc
+*~
+__pycache__
+myvenv
+genes.sqlite3
+/static
+.DS_Store
+data/
+log/
+.env
