@@ -24,8 +24,5 @@ async def get_track_db():
 
 def get_db(db_file: str):
     url = f'sqlite:///{db_file}'
-
-    engine = create_engine(url, connect_args={"check_same_thread": False})
-    db = Session(engine)
     
-    return db
+    return Session(create_engine(url, connect_args={"check_same_thread": False}))

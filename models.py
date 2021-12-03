@@ -4,6 +4,7 @@ from sqlalchemy.sql.sqltypes import DateTime
 
 from database import Base
 
+
 class Track(Base):
     __tablename__ = "tracks"
 
@@ -13,6 +14,9 @@ class Track(Base):
     track = Column(String)
     description = Column(String)
     version = Column(String)
+
+
+class DatabaseTrack(Track):
     db = Column(String)
 
 

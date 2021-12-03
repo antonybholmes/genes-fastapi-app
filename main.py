@@ -51,15 +51,16 @@ def _format_genes(track, genes, chr:str = '', s:int = -1, e:int = -1):
 
 @app.get('/search')
 async def search_route(genome: str = 'Human', 
-    assembly: str = 'grch38',
-    track: str = 'gencode',
+    assembly: str = 'GRCh38',
+    track: str = 'GENCODE',
+    v: int = -1,
     chr: str = 'chr3',
     s: int = 187721377,
     e: int = 187736497,
     q:str = '',
     track_db: Session = Depends(get_track_db)):
 
-    t = crud.get_track(track_db, genome, assembly, track)
+    t = crud.get_track(track_db, genome, assembly, track, v)
 
     db = get_db(t.db)
 
@@ -74,3 +75,7 @@ async def search_route(genome: str = 'Human',
         db.close()
 
     return ret
+
+@app.get('/tracks')
+async def tracks_route(track_db: Session = Depends(get_track_db)):
+    return crud.get_tracks(track_db)
