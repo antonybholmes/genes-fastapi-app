@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
-from database import get_db
+from database import get_db, get_track_db
 import crud
 
 app = FastAPI()
@@ -39,7 +39,7 @@ def _format_genes(track, genes, chr:str = '', s:int = -1, e:int = -1):
 
             current_transcript['ex'].append(current_exon)
 
-    ret = {'g':track.genome, 'a':track.assembly, 't':track.track, 'genes':ret}
+    ret = {'g':track.genome, 'a':track.assembly, 't':track.track, 'd':track.description, 'v':track.version, 'genes':ret}
 
     if chr != '':
         ret['c'] = chr
@@ -49,31 +49,28 @@ def _format_genes(track, genes, chr:str = '', s:int = -1, e:int = -1):
     return ret
 
 
-@app.get('/find')
-async def find_route(genome: str = 'Human', 
+@app.get('/search')
+async def search_route(genome: str = 'Human', 
     assembly: str = 'grch38',
     track: str = 'gencode',
     chr: str = 'chr3',
     s: int = 187721377,
     e: int = 187736497,
-    db: Session = Depends(get_db)):
+    q:str = '',
+    track_db: Session = Depends(get_track_db)):
 
-    t = crud.get_track(db, genome, assembly, track)
+    t = crud.get_track(track_db, genome, assembly, track)
 
-    genes = crud.find(db, t, chr, s, e)
+    db = get_db(t.db)
 
-    return _format_genes(t, genes, chr, s, e)
+    try:
+        if q != '':
+            genes = crud.search(db, q)
+        else:
+            genes = crud.find(db, chr, s, e)
 
+        ret = _format_genes(t, genes)
+    finally:
+        db.close()
 
-@app.get('/search')
-async def find_route(genome: str = 'Human', 
-    assembly: str = 'grch38',
-    track: str = 'gencode',
-    q:str = 'BCL6',
-    db: Session = Depends(get_db)):
-
-    t = crud.get_track(db, genome, assembly, track)
-
-    genes = crud.search(db, t, q)
-
-    return _format_genes(t, genes)
+    return ret
