@@ -15,7 +15,6 @@ def get_track(db: Session,
               track: str = 'GENCODE',
               version: int = -1):
 
-    print(genome, version)
     if version != -1:
         q = db.query(DatabaseTrack).filter(and_(func.lower(DatabaseTrack.genome) == func.lower(genome),
                                                 func.lower(DatabaseTrack.assembly) == func.lower(
